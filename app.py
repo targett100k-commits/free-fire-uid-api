@@ -1,16 +1,13 @@
 from flask import Flask, request, jsonify
-import os
 import requests
 
 app = Flask(__name__)
-
-GAMESKINBO_API_KEY = os.environ.get("GAMESKINBO_API_KEY")
 
 @app.route("/")
 def home():
     return jsonify({
         "status": "online",
-        "service": "Free Fire UID Info API"
+        "message": "Free Fire UID API is working"
     })
 
 
@@ -18,7 +15,6 @@ def home():
 def get_player_info():
 
     uid = request.args.get("uid")
-    region = request.args.get("region", "IND").upper()
 
     if not uid:
         return jsonify({
@@ -30,44 +26,29 @@ def get_player_info():
             "error": "UID must contain numbers only"
         }), 400
 
-    if not GAMESKINBO_API_KEY:
-        return jsonify({
-            "error": "Games Kinbo API key is not configured"
-        }), 500
-
-    url = "https://api.gameskinbo.com/ff-info/get"
-
-    headers = {
-        "x-api-key": GAMESKINBO_API_KEY
-    }
-
-    params = {
-        "uid": uid,
-        "region": region
-    }
-
     try:
+        api_url = "https://wzapiinfo.vercel.app/get"
 
         response = requests.get(
-            url,
-            headers=headers,
-            params=params,
+            api_url,
+            params={"uid": uid},
             timeout=20
         )
 
         try:
             data = response.json()
         except Exception:
-            data = {
-                "error": response.text
-            }
+            return jsonify({
+                "error": "API returned invalid response",
+                "status_code": response.status_code
+            }), 502
 
         return jsonify(data), response.status_code
 
     except requests.exceptions.RequestException as e:
 
         return jsonify({
-            "error": "Failed to connect to Games Kinbo",
+            "error": "Failed to connect to player API",
             "details": str(e)
         }), 502
 
