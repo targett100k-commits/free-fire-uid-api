@@ -28,13 +28,20 @@ def get_player_info():
         }), 400
 
     try:
-        api_url = "https://wzapiinfo.vercel.app/get"
+       api_url = "https://wzapiinfo.vercel.app/get"
 
-        response = requests.get(
-            api_url,
-            params={"uid": uid},
-            timeout=20
-        )
+response = requests.get(
+    api_url,
+    params={
+        "uid": uid,
+        "_t": int(__import__("time").time())
+    },
+    headers={
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+    },
+    timeout=20
+)
 
         try:
             data = response.json()
