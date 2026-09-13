@@ -1,10 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
-import time
 
 app = Flask(__name__)
-
 CORS(app)
 
 
@@ -33,17 +31,17 @@ def get_player_info():
 
     try:
 
-        api_url = "https://wzapiinfo.vercel.app/get"
+        # SOURCE API USED BY THE WEBSITE YOU PROVIDED
+        api_url = "https://s.xysushi.in/ff/"
 
         response = requests.get(
             api_url,
             params={
-                "uid": uid,
-                "_t": int(time.time())
+                "uid": uid
             },
             headers={
-                "Cache-Control": "no-cache",
-                "Pragma": "no-cache"
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0"
             },
             timeout=20
         )
@@ -53,8 +51,9 @@ def get_player_info():
 
         except Exception:
             return jsonify({
-                "error": "API returned invalid response",
-                "status_code": response.status_code
+                "error": "Source API returned invalid response",
+                "status_code": response.status_code,
+                "response_preview": response.text[:300]
             }), 502
 
         return jsonify(data), response.status_code
@@ -62,7 +61,7 @@ def get_player_info():
     except requests.exceptions.RequestException as e:
 
         return jsonify({
-            "error": "Failed to connect to player API",
+            "error": "Failed to connect to source API",
             "details": str(e)
         }), 502
 
