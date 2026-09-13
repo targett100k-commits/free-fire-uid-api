@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import time
 
 app = Flask(__name__)
+
 CORS(app)
+
+
 @app.route("/")
 def home():
     return jsonify({
@@ -28,23 +32,25 @@ def get_player_info():
         }), 400
 
     try:
-       api_url = "https://wzapiinfo.vercel.app/get"
 
-response = requests.get(
-    api_url,
-    params={
-        "uid": uid,
-        "_t": int(__import__("time").time())
-    },
-    headers={
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache"
-    },
-    timeout=20
-)
+        api_url = "https://wzapiinfo.vercel.app/get"
+
+        response = requests.get(
+            api_url,
+            params={
+                "uid": uid,
+                "_t": int(time.time())
+            },
+            headers={
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache"
+            },
+            timeout=20
+        )
 
         try:
             data = response.json()
+
         except Exception:
             return jsonify({
                 "error": "API returned invalid response",
